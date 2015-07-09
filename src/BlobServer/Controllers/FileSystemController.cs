@@ -14,16 +14,23 @@ namespace BlobServer.Controllers
     [RoutePrefix("api/files")]
     public class FileSystemController : ApiController
     {
-        private readonly IStorageProvider _storages;
+        private static readonly IStorageProvider _storages;
         private readonly IPathCreator _pathCreator;
 
-        public FileSystemController()
+        static FileSystemController()
         {
             _storages = new CapacityBasedStorageProvider(new[]
             {
-                new FileSystemStorage(new DirectoryInfo("d:\\storagetest"), "D"),
-                new FileSystemStorage(new DirectoryInfo("f:\\storagetest"), "F"),
+                //new FileSystemStorage(new DirectoryInfo("d:\\storagetest"), "D"),
+                //new FileSystemStorage(new DirectoryInfo("f:\\storagetest"), "F"),
+                new MemoryStorage("RAM"),
             }, CapacityBasedStorageProvider.SelectionMode.RandomlySelectStorageWithEnoughSpace);
+
+        }
+
+        public FileSystemController()
+        {
+        
 
             _pathCreator = new DateTimePathCreator();
         }
@@ -79,9 +86,12 @@ namespace BlobServer.Controllers
 
         private void ParsePath(string fullPath, out IFileStorage stg, out string localPath)
         {
+            // todo set stg to null if key not found
+            // so response can be 404
+
             var parts = fullPath.SplitPath();
             stg = _storages.GetStorageByKey(parts[0]);
-            localPath = string.Join(Path.DirectorySeparatorChar.ToString(), parts.Skip(1));
+            localPath = string.Join("/", parts.Skip(1));
         }
     }
 }

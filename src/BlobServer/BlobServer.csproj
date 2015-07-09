@@ -164,6 +164,7 @@
     <Compile Include="Infrastructure\ByteEnumeratorStream.cs" />
     <Compile Include="Infrastructure\DateTimePathCreator.cs" />
     <Compile Include="Infrastructure\FileSystemStorage.cs" />
+    <Compile Include="Infrastructure\MemoryStorage.cs" />
     <Compile Include="Infrastructure\RandomStorageProvider.cs" />
     <Compile Include="Models\FileStorageCapacity.cs" />
     <Compile Include="Infrastructure\IFileStorage.cs" />

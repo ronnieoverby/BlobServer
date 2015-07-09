@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using BlobServer.Models;
 using CoreTechs.Common;
 
 namespace BlobServer.Infrastructure
@@ -14,10 +13,10 @@ namespace BlobServer.Infrastructure
         public RandomStorageProvider(IEnumerable<IFileStorage> storages)
         {
             if (storages == null) throw new ArgumentNullException("storages");
-            _storages = storages.ToDictionary(x => x.Key);
+            _storages = storages.ToDictionary(x => x.Key, StringComparer.OrdinalIgnoreCase);
         }
 
-        public Task<IFileStorage> GetFileStorageAsync(UploadedFile uploadedFile)
+        public Task<IFileStorage> GetFileStorageAsync(ByteSize requiredSize)
         {
             return Task.FromResult(_storages.Values.RandomElement());
         }

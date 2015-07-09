@@ -15,7 +15,7 @@ namespace BlobServer.Infrastructure
         public CapacityBasedStorageProvider(IEnumerable<IFileStorage> storages, SelectionMode mode)
         {
             if (storages == null) throw new ArgumentNullException("storages");
-            _storages = storages.ToDictionary(x => x.Key);
+            _storages = storages.ToDictionary(x => x.Key, StringComparer.OrdinalIgnoreCase);
             _mode = mode;
         }
 
@@ -25,15 +25,15 @@ namespace BlobServer.Infrastructure
             SelectStorageWithTheMostFreeSpace
         }
 
-        public Task<IFileStorage> GetFileStorageAsync(UploadedFile uploadedFile)
+        public Task<IFileStorage> GetFileStorageAsync(ByteSize requiredSize)
         {
             switch (_mode)
             {
                 case SelectionMode.RandomlySelectStorageWithEnoughSpace:
-                    return RandomlySelectStorageWithEnoughSpaceAsync(uploadedFile);
+                    return RandomlySelectStorageWithEnoughSpaceAsync(requiredSize);
 
                 case SelectionMode.SelectStorageWithTheMostFreeSpace:
-                    return SelectStorageWithTheMostFreeSpaceAsync(uploadedFile);
+                    return SelectStorageWithTheMostFreeSpaceAsync();
 
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -45,12 +45,20 @@ namespace BlobServer.Infrastructure
             return _storages[key];
         }
 
-        async private Task<IFileStorage> SelectStorageWithTheMostFreeSpaceAsync(UploadedFile uploadedFile)
+        async private Task<IFileStorage> SelectStorageWithTheMostFreeSpaceAsync()
         {
-            return _storages.Values.OrderByDescending(async x => (await x.GetCapacityAsync()).Available.Bytes).First();
+            var stats = new List<Tuple<IFileStorage, FileStorageCapacity>>();
+
+            foreach (var stg in _storages.Values)
+            {
+                var cap = await stg.GetCapacityAsync();
+                stats.Add(Tuple.Create(stg, cap));
+            }
+
+            return stats.OrderByDescending(x => x.Item2.Available).First().Item1;
         }
 
-        async private Task<IFileStorage> RandomlySelectStorageWithEnoughSpaceAsync(UploadedFile uploadedFile)
+        async private Task<IFileStorage> RandomlySelectStorageWithEnoughSpaceAsync(ByteSize requiredSize)
         {
             var storages = new List<IFileStorage>();
 
@@ -58,7 +66,7 @@ namespace BlobServer.Infrastructure
             {
                 var cap = await stg.GetCapacityAsync();
 
-                if (uploadedFile.DataSize == null || cap.Available > uploadedFile.DataSize)
+                if (requiredSize == null || cap.Available > requiredSize)
                     storages.Add(stg);
             }
 

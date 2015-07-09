@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using BlobServer.Infrastructure;
+using CoreTechs.Common;
 
 namespace BlobServer.Controllers
 {
@@ -14,14 +15,17 @@ namespace BlobServer.Controllers
     public class FileSystemController : ApiController
     {
         private readonly IStorageProvider _storages;
+        private readonly IPathCreator _pathCreator;
 
         public FileSystemController()
         {
-            _storages = new RandomStorageProvider(new[]
+            _storages = new CapacityBasedStorageProvider(new[]
             {
-                new FileSystemStorage(new DirectoryInfo("d:\\storagetest"), "D_DRIVE"),
-                new FileSystemStorage(new DirectoryInfo("f:\\storagetest"), "F_DRIVE"),
-            });
+                new FileSystemStorage(new DirectoryInfo("d:\\storagetest"), "D"),
+                new FileSystemStorage(new DirectoryInfo("f:\\storagetest"), "F"),
+            }, CapacityBasedStorageProvider.SelectionMode.RandomlySelectStorageWithEnoughSpace);
+
+            _pathCreator = new DateTimePathCreator();
         }
 
         [Route("{*path}")]
@@ -32,7 +36,7 @@ namespace BlobServer.Controllers
             ParsePath(path, out stg, out localPath);
 
             if (!await stg.ExistsAsync(localPath))
-                return new HttpResponseMessage(HttpStatusCode.NotFound);
+                return NotFound();
 
             var stream = await stg.GetReadStream(localPath);
 
@@ -45,6 +49,32 @@ namespace BlobServer.Controllers
             response.Content.Headers.ContentType = new MediaTypeHeaderValue(contentType);
 
             return response;
+        }
+
+        [Route]
+        public async Task<HttpResponseMessage> Post([FromUri]string filename = null, [FromUri]string extension = null)
+        {
+            IFileStorage stg;
+            string path;
+            using (var stream = await Request.Content.ReadAsStreamAsync())
+            {
+                stg = await _storages.GetFileStorageAsync(ByteSize.FromBytes(stream.Length));
+                path = _pathCreator.CreatePath(filename, extension);
+                await stg.StoreAsync(path, stream);
+            }
+            var fullPath = string.Format("{0}/{1}", stg.Key, path);
+            return new HttpResponseMessage
+            {
+                Content = new StringContent(fullPath)
+            };
+        }
+
+        private new static HttpResponseMessage NotFound()
+        {
+            return new HttpResponseMessage(HttpStatusCode.NotFound)
+            {
+                Content = new StringContent("Not Found")
+            };
         }
 
         private void ParsePath(string fullPath, out IFileStorage stg, out string localPath)

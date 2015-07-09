@@ -17,32 +17,33 @@ namespace BlobServer.Infrastructure
         public string CreatePath( string fileName = null, string extension = null)
         {
             var now = DateTime.Now;
-            var parts = new List<string> { now.Year.ToString()};
+            var parts = new List<string>();
 
-            if (Resolution != DateTimePrecision.Year)
-                parts.Add(now.Month.ToString());
+            var dtValues = new[]
+            {
+                Tuple.Create(DateTimePrecision.Year, now.Year),
+                Tuple.Create(DateTimePrecision.Month, now.Month),
+                Tuple.Create(DateTimePrecision.Day, now.Day),
+                Tuple.Create(DateTimePrecision.Hour, now.Hour),
+                Tuple.Create(DateTimePrecision.Minute, now.Minute),
+                Tuple.Create(DateTimePrecision.Second, now.Second),
+                Tuple.Create(DateTimePrecision.Millisecond, now.Millisecond),
+            };
 
-            if (Resolution != DateTimePrecision.Month)
-                parts.Add(now.Day.ToString());
-
-            if (Resolution != DateTimePrecision.Day)
-                parts.Add(now.Hour.ToString());
-
-            if (Resolution != DateTimePrecision.Hour)
-                parts.Add(now.Minute.ToString());
-
-            if (Resolution != DateTimePrecision.Minute)
-                parts.Add(now.Second.ToString());
-
-            if (Resolution != DateTimePrecision.Second)
-                parts.Add(now.Millisecond.ToString());
+            foreach (var x in dtValues)
+            {
+                parts.Add(x.Item2.ToString());
+                
+                if (x.Item1 == Resolution)
+                    break;
+            }
 
             if (fileName.IsNullOrWhiteSpace())
                 fileName = Guid.NewGuid().ToString();
 
             parts.Add(fileName);
 
-            var path = string.Join(Path.DirectorySeparatorChar.ToString(), parts);
+            var path = string.Join("/", parts);
 
             if (!extension.IsNullOrWhiteSpace())
                 path = Path.ChangeExtension(path, extension);

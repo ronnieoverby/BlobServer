@@ -32,6 +32,10 @@ namespace BlobServer.Infrastructure
         public async Task StoreAsync(string path, Stream stream)
         {
             var file = GetFileInfo(path);
+
+            if (!file.Directory.Exists)
+                file.Directory.Create();
+
             using (var dest = file.Open(FileMode.Create, FileAccess.Write, FileShare.None))
                 await stream.CopyToAsync(dest);
         }

@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web.Http;
+﻿using System.Web.Http;
+using System.Web.Http.Hosting;
+using BlobServer.Infrastructure;
 
 namespace BlobServer
 {
@@ -10,6 +9,7 @@ namespace BlobServer
         public static void Register(HttpConfiguration config)
         {
             // Web API configuration and services
+            config.Services.Replace(typeof (IHostBufferPolicySelector), new CustomWebHostBufferPolicySelector());
 
             // Web API routes
             config.MapHttpAttributeRoutes();

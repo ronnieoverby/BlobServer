@@ -1,6 +1,6 @@
 namespace BlobServer.Infrastructure
 {
-    internal interface IPathCreator
+    public interface IPathCreator
     {
         string CreatePath(string fileName = null, string extension = null);
     }

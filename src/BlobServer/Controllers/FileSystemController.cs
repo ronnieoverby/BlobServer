@@ -14,25 +14,13 @@ namespace BlobServer.Controllers
     [RoutePrefix("api/files")]
     public class FileSystemController : ApiController
     {
-        private static readonly IStorageProvider _storages;
+        private  readonly IStorageProvider _storages;
         private readonly IPathCreator _pathCreator;
 
-        static FileSystemController()
+        public FileSystemController(IPathCreator pathCreator, IStorageProvider storages)
         {
-            _storages = new CapacityBasedStorageProvider(new[]
-            {
-                //new FileSystemStorage(new DirectoryInfo("d:\\storagetest"), "D"),
-                //new FileSystemStorage(new DirectoryInfo("f:\\storagetest"), "F"),
-                new MemoryStorage("RAM"),
-            }, CapacityBasedStorageProvider.SelectionMode.RandomlySelectStorageWithEnoughSpace);
-
-        }
-
-        public FileSystemController()
-        {
-        
-
-            _pathCreator = new DateTimePathCreator();
+            _pathCreator = pathCreator;
+            _storages = storages;
         }
 
         [Route("{*path}")]

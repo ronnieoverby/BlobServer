@@ -10,6 +10,7 @@ namespace BlobServer.Infrastructure
     {
         private readonly DirectoryInfo _directoryInfo;
 
+
         public FileSystemStorage(DirectoryInfo directoryInfo, string uniqueKey)
         {
             if (directoryInfo == null) throw new ArgumentNullException("directoryInfo");
@@ -31,27 +32,35 @@ namespace BlobServer.Infrastructure
 
         public async Task StoreAsync(string path, Stream stream)
         {
+            EnsurePathDoesntRepresentSubDirectory(path);
+
             var file = GetFileInfo(path);
 
             if (!file.Directory.Exists)
-                file.Directory.Create();
+               file.Directory.Create();
 
             using (var dest = file.Open(FileMode.Create, FileAccess.Write, FileShare.None))
-                await stream.CopyToAsync(dest);
+                await  stream.CopyToAsync(dest);
         }
+
 
         public async Task AppendAsync(string path, Stream stream)
         {
-            if (_directoryInfo.GetSubDirectory(path).Exists)
-                throw new InvalidOperationException("Path represents an existing directory");
+            EnsurePathDoesntRepresentSubDirectory(path);
 
             var file = GetFileInfo(path);
 
             if (!file.Directory.Exists)
-                file.Directory.Create();
+                 file.Directory.Create();
 
             using (var dest = file.Open(FileMode.Append, FileAccess.Write, FileShare.None))
                 await stream.CopyToAsync(dest);
+        }
+
+        private void EnsurePathDoesntRepresentSubDirectory(string path)
+        {
+            if (_directoryInfo.GetSubDirectory(path).Exists)
+                throw new InvalidOperationException("Path represents an existing directory");
         }
 
         public Task<bool> DeleteAsync(string path)
@@ -93,5 +102,7 @@ namespace BlobServer.Infrastructure
             Stream stream = GetFileInfo(path).OpenRead();
             return Task.FromResult(stream);
         }
+
     }
+
 }

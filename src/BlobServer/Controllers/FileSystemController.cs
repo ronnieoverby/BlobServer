@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -47,8 +48,12 @@ namespace BlobServer.Controllers
             return response;
         }
 
-        [Route]
-        public async Task<HttpResponseMessage> Put([FromUri]string filename = null, [FromUri]string extension = null, [FromUri]string rootFolder = null, [FromUri]string path = null)
+        [Route("{*path}")]
+        public async Task<HttpResponseMessage> Put(
+            [FromUri]string filename = null, 
+            [FromUri]string extension = null, 
+            [FromUri]string rootFolder = null,
+            [FromUri]string path = null)
         {
             IFileStorage stg;
             using (var stream = await Request.Content.ReadAsStreamAsync())
@@ -91,7 +96,7 @@ namespace BlobServer.Controllers
                 return Respond(HttpStatusCode.NotFound);
 
             await stg.DeleteAsync(localPath);
-            return Respond(HttpStatusCode.NoContent, "");
+            return Respond(HttpStatusCode.NoContent);
         }
 
         [AcceptVerbs("PATCH")]
@@ -108,7 +113,7 @@ namespace BlobServer.Controllers
             using (var stream = await Request.Content.ReadAsStreamAsync())
             {
                 await stg.AppendAsync(localPath, stream);
-                return Respond(HttpStatusCode.NoContent, "");
+                return Respond(HttpStatusCode.NoContent);
             }
         }
 
@@ -124,6 +129,15 @@ namespace BlobServer.Controllers
 
         private static HttpResponseMessage Respond(HttpStatusCode statusCode, string text = null)
         {
+            if (statusCode == HttpStatusCode.NoContent)
+            {
+                if (!string.IsNullOrEmpty(text))
+                    throw new InvalidOperationException(
+                        "204 NoContent means no content! You tried to respond with: " + text);
+
+                text = string.Empty;
+            }
+
             return new HttpResponseMessage(statusCode)
             {
                 Content = new StringContent(text ?? statusCode.Humanize())

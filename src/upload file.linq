@@ -1,14 +1,22 @@
 <Query Kind="Statements">
+  <Reference Relative="BlobServer.Client\bin\Debug\BlobServer.Client.dll">D:\Code\BlobServer\src\BlobServer.Client\bin\Debug\BlobServer.Client.dll</Reference>
   <Reference>&lt;RuntimeDirectory&gt;\System.Net.Http.dll</Reference>
+  <NuGetReference>CoreTechs.Common</NuGetReference>
   <NuGetReference>Microsoft.AspNet.WebApi.Client</NuGetReference>
+  <Namespace>BlobServer.Client</Namespace>
+  <Namespace>CoreTechs.Common</Namespace>
   <Namespace>System.Net.Http</Namespace>
 </Query>
 
-using(HttpClient client = new HttpClient())
+
+using(var client = new BlobServerClient("http://localhost:63238"))
 {
-	client.BaseAddress = new Uri("http://localhost:63238/api/files");
-	var resp = await client.PostAsync("?extension=.zip", new StreamContent(File.OpenRead(@"C:\Users\Ronnie\Desktop\SKYRIM OST.zip")));
-	resp.Content.ReadAsStringAsync().Dump();
+	var files = new DirectoryInfo(@"C:\Users\roverby\Desktop").GetFiles("*",SearchOption.AllDirectories);
+	while(true)
+	{
+		var file = files.RandomElement();		
+		var path = await client.StoreFromStreamAsync(file.OpenRead(), file.Name, rootFolder: "Batch/5");
+		var bytes = await client.GetBytesAsync(path.Dump());
+		await client.DeleteAsync(path);
+	}
 }
-
-

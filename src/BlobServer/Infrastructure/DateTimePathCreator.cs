@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using CoreTechs.Common;
 
 namespace BlobServer.Infrastructure
@@ -9,15 +10,18 @@ namespace BlobServer.Infrastructure
     {
         public DateTimePathCreator()
         {
-            Resolution = DateTimePrecision.Minute;
+            Resolution = DateTimePrecision.Hour;
         }
 
         public DateTimePrecision Resolution { get; set; }
 
-        public string CreatePath( string fileName = null, string extension = null)
+        public string CreatePath(string rootFolder = null, string fileName = null, string extension = null)
         {
             var now = DateTime.Now;
             var parts = new List<string>();
+
+            if (!string.IsNullOrWhiteSpace(rootFolder))
+                parts.Add(rootFolder);
 
             var dtValues = new[]
             {
@@ -33,7 +37,7 @@ namespace BlobServer.Infrastructure
             foreach (var x in dtValues)
             {
                 parts.Add(x.Item2.ToString());
-                
+
                 if (x.Item1 == Resolution)
                     break;
             }
@@ -49,6 +53,16 @@ namespace BlobServer.Infrastructure
                 path = Path.ChangeExtension(path, extension);
 
             return path;
+        }
+
+        
+        public string AppendRandomDirectory(string path)
+        {
+            var parts = path.SplitPath().ToList();
+            var random = (Characters.Keyboard.UpperLetters + Characters.Keyboard.Digits).RandomElement().ToString();
+            parts.Insert(parts.Count - 1, random);
+            var path2 = string.Join("/", parts);
+            return path2;
         }
     }
 }

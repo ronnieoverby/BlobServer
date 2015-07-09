@@ -46,6 +46,10 @@ namespace BlobServer.Infrastructure
                 throw new InvalidOperationException("Path represents an existing directory");
 
             var file = GetFileInfo(path);
+
+            if (!file.Directory.Exists)
+                file.Directory.Create();
+
             using (var dest = file.Open(FileMode.Append, FileAccess.Write, FileShare.None))
                 await stream.CopyToAsync(dest);
         }

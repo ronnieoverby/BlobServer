@@ -20,15 +20,6 @@ namespace BlobServer.Infrastructure
             if (serviceType == typeof (FileSystemController))
                 return new FileSystemController(_configuration.PathCreator, _configuration.StorageProvider);
 
-            if (serviceType == typeof (Configuration))
-                return _configuration;
-            
-            if (serviceType == typeof (IPathCreator))
-                return _configuration.PathCreator;
-
-            if (serviceType == typeof (IStorageProvider))
-                return _configuration.StorageProvider;
-
             return null;
         }
 

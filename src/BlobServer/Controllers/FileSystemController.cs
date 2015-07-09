@@ -8,13 +8,14 @@ using System.Web;
 using System.Web.Http;
 using BlobServer.Infrastructure;
 using CoreTechs.Common;
+using Humanizer;
 
 namespace BlobServer.Controllers
 {
     [RoutePrefix("api/files")]
     public class FileSystemController : ApiController
     {
-        private  readonly IStorageProvider _storages;
+        private readonly IStorageProvider _storages;
         private readonly IPathCreator _pathCreator;
 
         public FileSystemController(IPathCreator pathCreator, IStorageProvider storages)
@@ -31,7 +32,7 @@ namespace BlobServer.Controllers
             ParsePath(path, out stg, out localPath);
 
             if (!await stg.ExistsAsync(localPath))
-                return NotFound();
+                return Respond(HttpStatusCode.NotFound);
 
             var stream = await stg.GetReadStream(localPath);
 
@@ -47,14 +48,29 @@ namespace BlobServer.Controllers
         }
 
         [Route]
-        public async Task<HttpResponseMessage> Post([FromUri]string filename = null, [FromUri]string extension = null)
+        public async Task<HttpResponseMessage> Put([FromUri]string filename = null, [FromUri]string extension = null, [FromUri]string rootFolder = null, [FromUri]string path = null)
         {
             IFileStorage stg;
-            string path;
             using (var stream = await Request.Content.ReadAsStreamAsync())
             {
                 stg = await _storages.GetFileStorageAsync(ByteSize.FromBytes(stream.Length));
-                path = _pathCreator.CreatePath(filename, extension);
+
+                var pathNotSupplied = string.IsNullOrWhiteSpace(path);
+
+                if (pathNotSupplied)
+                {
+                    path = _pathCreator.CreatePath(rootFolder.TrimDirectorySeparators(), filename, extension)
+                            .TrimDirectorySeparators();
+
+                    while (await stg.ExistsAsync(path))
+                    {
+                        // file exists at path
+                        // do not overwrite
+
+                        path = _pathCreator.AppendRandomDirectory(path);
+                    }
+                }
+
                 await stg.StoreAsync(path, stream);
             }
             var fullPath = string.Format("{0}/{1}", stg.Key, path);
@@ -64,12 +80,36 @@ namespace BlobServer.Controllers
             };
         }
 
-        private new static HttpResponseMessage NotFound()
+        [Route("{*path}")]
+        public async Task<HttpResponseMessage> Delete(string path)
         {
-            return new HttpResponseMessage(HttpStatusCode.NotFound)
+            IFileStorage stg;
+            string localPath;
+            ParsePath(path, out stg, out localPath);
+
+            if (!await stg.ExistsAsync(localPath))
+                return Respond(HttpStatusCode.NotFound);
+
+            await stg.DeleteAsync(localPath);
+            return Respond(HttpStatusCode.NoContent, "");
+        }
+
+        [AcceptVerbs("PATCH")]
+        [Route("{*path}")]
+        public async Task<HttpResponseMessage> Patch(string path)
+        {
+            IFileStorage stg;
+            string localPath;
+            ParsePath(path, out stg, out localPath);
+
+            if (!await stg.ExistsAsync(localPath))
+                return Respond(HttpStatusCode.NotFound);
+
+            using (var stream = await Request.Content.ReadAsStreamAsync())
             {
-                Content = new StringContent("Not Found")
-            };
+                await stg.AppendAsync(localPath, stream);
+                return Respond(HttpStatusCode.NoContent, "");
+            }
         }
 
         private void ParsePath(string fullPath, out IFileStorage stg, out string localPath)
@@ -80,6 +120,14 @@ namespace BlobServer.Controllers
             var parts = fullPath.SplitPath();
             stg = _storages.GetStorageByKey(parts[0]);
             localPath = string.Join("/", parts.Skip(1));
+        }
+
+        private static HttpResponseMessage Respond(HttpStatusCode statusCode, string text = null)
+        {
+            return new HttpResponseMessage(statusCode)
+            {
+                Content = new StringContent(text ?? statusCode.Humanize())
+            };
         }
     }
 }

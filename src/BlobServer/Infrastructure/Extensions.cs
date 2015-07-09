@@ -13,5 +13,10 @@ namespace BlobServer.Infrastructure
             var parts = path.Trim(DirSeparators).Split(DirSeparators);
             return parts;
         }
+
+        public static string TrimDirectorySeparators(this string path)
+        {
+            return path.Trim(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        }
     }
 }

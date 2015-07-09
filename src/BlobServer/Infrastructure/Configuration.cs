@@ -1,4 +1,6 @@
-﻿using ConfigR;
+﻿using System.Reflection;
+using ConfigR;
+using CoreTechs.Common;
 
 namespace BlobServer.Infrastructure
 {
@@ -9,8 +11,9 @@ namespace BlobServer.Infrastructure
 
         public static Configuration CreateUsingConfigR()
         {
-            var assembly = typeof(Configuration).Assembly; 
-            Config.GlobalAutoLoadingReferences.Add(assembly);
+            Config.GlobalAutoLoadingReferences.Add(typeof(Configuration).Assembly);
+            Config.GlobalAutoLoadingReferences.Add(typeof (DateTimePrecision).Assembly);
+
             var config = Config.Global.Get<Configuration>();
             return config;
         }

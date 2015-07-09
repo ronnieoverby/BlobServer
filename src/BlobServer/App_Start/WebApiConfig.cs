@@ -12,10 +12,16 @@ namespace BlobServer
             config.DependencyResolver = new DependencyResolver(appConfig);
 
             // Web API configuration and services
-            config.Services.Replace(typeof (IHostBufferPolicySelector), new CustomWebHostBufferPolicySelector());
+            config.Services.Replace(typeof(IHostBufferPolicySelector), new CustomWebHostBufferPolicySelector());
 
             // Web API routes
             config.MapHttpAttributeRoutes();
+/*
+            config.Routes.MapHttpRoute(
+                name: "FileSystem",
+                routeTemplate: "api/files/{*path}",
+                defaults: new { path = RouteParameter.Optional, controller = "FileSystem" }
+            );*/
 
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",

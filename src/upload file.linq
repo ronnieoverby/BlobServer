@@ -8,8 +8,7 @@
   <Namespace>System.Net.Http</Namespace>
 </Query>
 
-
-using(var client = new BlobServerClient("http://localhost:63238"))
+using(var client = new BlobServerClient("http://blobserver.coretechs.net"))
 {
 	var files = new DirectoryInfo(@"C:\Users\roverby\Desktop").GetFiles("*",SearchOption.AllDirectories);
 	while(true)
@@ -17,6 +16,7 @@ using(var client = new BlobServerClient("http://localhost:63238"))
 		var file = files.RandomElement();		
 		var path = await client.StoreFromStreamAsync(file.OpenRead(), file.Name, rootFolder: "Batch/5");
 		var bytes = await client.GetBytesAsync(path.Dump());
+		//await client.AppendBytesAsync(path, new byte[]{1});
 		await client.DeleteAsync(path);
 	}
 }

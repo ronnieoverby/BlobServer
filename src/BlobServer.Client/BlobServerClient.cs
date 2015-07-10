@@ -48,17 +48,36 @@ namespace BlobServer.Client
                     qs["rootFolder"] = rootFolder;
 
                 var resp = await _client.PostAsync(qs.ToString(), new StreamContent(stream)).ConfigureAwait(false);
-                path = await resp.EnsureSuccessStatusCode().Content.ReadAsStringAsync().ConfigureAwait(false);
+
+                await EnsureSuccess(resp);
+
+                path = await resp.Content.ReadAsStringAsync().ConfigureAwait(false);
             }
             else
             {
                 qs["path"] = path;
                 var resp = await _client.PutAsync(qs.ToString(), new StreamContent(stream)).ConfigureAwait(false);
-                path = await resp.EnsureSuccessStatusCode().Content.ReadAsStringAsync().ConfigureAwait(false);
+                await EnsureSuccess(resp);
+              
+                path = await resp.Content.ReadAsStringAsync().ConfigureAwait(false);
             }
             return path;
         }
 
+        private static async Task EnsureSuccess(HttpResponseMessage resp)
+        {
+            if (resp.IsSuccessStatusCode)
+                return;
+
+            //var content = await resp.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var stream = await resp.Content.ReadAsStreamAsync();
+
+            var ms = new MemoryStream();
+            stream.CopyTo(ms);
+            var content = Convert.ToBase64String(ms.ToArray());
+            throw new ApplicationException(content);
+        }
+        
         public async Task<byte[]> GetBytesAsync(string path)
         {
             if (path == null) throw new ArgumentNullException("path");
@@ -77,7 +96,9 @@ namespace BlobServer.Client
             var qs = new QueryStringBuilder { { "path", path } };
 
             var resp = await _client.GetAsync(qs.ToString()).ConfigureAwait(false);
-            return await resp.EnsureSuccessStatusCode().Content.ReadAsStreamAsync().ConfigureAwait(false);
+            await EnsureSuccess(resp);
+
+            return await resp.Content.ReadAsStreamAsync().ConfigureAwait(false);
         }
 
         public async Task DeleteAsync(string path)
@@ -85,7 +106,7 @@ namespace BlobServer.Client
             if (path == null) throw new ArgumentNullException("path");
             var qs = new QueryStringBuilder { { "path", path } };
             var resp = await _client.DeleteAsync(qs.ToString()).ConfigureAwait(false);
-            resp.EnsureSuccessStatusCode();
+            await EnsureSuccess(resp);
         }
 
         public async Task AppendBytesAsync(string path, byte[] bytes)
@@ -105,7 +126,7 @@ namespace BlobServer.Client
             var content = new StreamContent(stream);
             var qs = new QueryStringBuilder { { "path", path } };
             var resp = await _client.SendAsync("PATCH", qs.ToString(), content).ConfigureAwait(false);
-            resp.EnsureSuccessStatusCode();
+            await EnsureSuccess(resp);
         }
     }
 }

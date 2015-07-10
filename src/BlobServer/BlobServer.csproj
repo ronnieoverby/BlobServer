@@ -154,6 +154,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
+    <Compile Include="Infrastructure\ExceptionHandlingAttribute.cs" />
     <Compile Include="Infrastructure\Configuration.cs" />
     <Compile Include="Infrastructure\CustomWebHostBufferPolicySelector.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />

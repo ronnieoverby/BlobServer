@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -13,6 +14,7 @@ using Humanizer;
 
 namespace BlobServer.Controllers
 {
+    [ExceptionHandling]
     [RoutePrefix("api/files")]
     public class FileSystemController : ApiController
     {
@@ -48,41 +50,48 @@ namespace BlobServer.Controllers
             return response;
         }
 
-        [Route("{*path}")]
-        public async Task<HttpResponseMessage> Put(
-            [FromUri]string filename = null, 
-            [FromUri]string extension = null, 
-            [FromUri]string rootFolder = null,
-            [FromUri]string path = null)
+        [Route]
+        public async Task<HttpResponseMessage> Post(
+            [FromUri]string filename = null,
+            [FromUri]string extension = null,
+            [FromUri]string rootFolder = null)
         {
-            IFileStorage stg;
             using (var stream = await Request.Content.ReadAsStreamAsync())
             {
-                stg = await _storages.GetFileStorageAsync(ByteSize.FromBytes(stream.Length));
+                var stg = await _storages.GetFileStorageAsync(ByteSize.FromBytes(stream.Length));
 
-                var pathNotSupplied = string.IsNullOrWhiteSpace(path);
+                var path = _pathCreator.CreatePath(rootFolder.TrimDirectorySeparators(), filename, extension)
+                    .TrimDirectorySeparators();
 
-                if (pathNotSupplied)
+                while (await stg.ExistsAsync(path))
                 {
-                    path = _pathCreator.CreatePath(rootFolder.TrimDirectorySeparators(), filename, extension)
-                            .TrimDirectorySeparators();
+                    // file exists at path
+                    // do not overwrite
 
-                    while (await stg.ExistsAsync(path))
-                    {
-                        // file exists at path
-                        // do not overwrite
-
-                        path = _pathCreator.AppendRandomDirectory(path);
-                    }
+                    path = _pathCreator.AppendRandomDirectory(path);
                 }
 
                 await stg.StoreAsync(path, stream);
+
+                var fullPath = string.Format("{0}/{1}", stg.Key, path);
+                return Respond(HttpStatusCode.OK, fullPath);
             }
-            var fullPath = string.Format("{0}/{1}", stg.Key, path);
-            return new HttpResponseMessage
-            {
-                Content = new StringContent(fullPath)
-            };
+        }
+
+        [Route("{*path}")]
+        public async Task<HttpResponseMessage> Put([FromUri]string path)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+                Respond(HttpStatusCode.BadRequest, "Path not specified");
+
+            IFileStorage stg;
+            string localPath;
+            ParsePath(path, out stg, out localPath);
+
+            using (var stream = await Request.Content.ReadAsStreamAsync())
+                await stg.StoreAsync(path, stream);
+
+            return Respond(HttpStatusCode.OK);
         }
 
         [Route("{*path}")]

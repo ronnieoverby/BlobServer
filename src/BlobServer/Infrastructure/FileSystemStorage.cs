@@ -6,6 +6,7 @@ using CoreTechs.Common;
 
 namespace BlobServer.Infrastructure
 {
+    
     public class FileSystemStorage : IFileStorage
     {
         private readonly DirectoryInfo _directoryInfo;

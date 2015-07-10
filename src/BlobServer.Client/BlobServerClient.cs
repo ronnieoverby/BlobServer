@@ -22,30 +22,40 @@ namespace BlobServer.Client
             _client.Dispose();
         }
 
-        public async Task<string> StoreBytesAsync(byte[] bytes, string filename = null, string extension = null, string rootFolder=null)
+        public async Task<string> StoreBytesAsync(byte[] bytes, string filename = null, string extension = null, string rootFolder = null, string path = null)
         {
             if (bytes == null) throw new ArgumentNullException("bytes");
             using (var ms = new MemoryStream(bytes))
-                return await StoreFromStreamAsync(ms, filename, extension).ConfigureAwait(false);
+                return await StoreFromStreamAsync(ms, filename, extension, path).ConfigureAwait(false);
         }
 
-        public async Task<string> StoreFromStreamAsync(Stream stream, string filename = null, string extension = null, string rootFolder = null)
+        public async Task<string> StoreFromStreamAsync(Stream stream, string filename = null, string extension = null, string rootFolder = null, string path = null)
         {
             if (stream == null) throw new ArgumentNullException("stream");
+
             var qs = new QueryStringBuilder();
 
-            if (!string.IsNullOrWhiteSpace(filename))
-                qs["filename"] = filename;
+            if (string.IsNullOrWhiteSpace(path))
+            {
 
-            if (!string.IsNullOrWhiteSpace(extension))
-                qs["extension"] = extension;
+                if (!string.IsNullOrWhiteSpace(filename))
+                    qs["filename"] = filename;
 
-            if (!string.IsNullOrWhiteSpace(rootFolder))
-                qs["rootFolder"] = rootFolder;
+                if (!string.IsNullOrWhiteSpace(extension))
+                    qs["extension"] = extension;
 
-            var resp = await _client.PutAsync(qs.ToString(), new StreamContent(stream)).ConfigureAwait(false);
+                if (!string.IsNullOrWhiteSpace(rootFolder))
+                    qs["rootFolder"] = rootFolder;
 
-            var path = await resp.EnsureSuccessStatusCode().Content.ReadAsStringAsync().ConfigureAwait(false);
+                var resp = await _client.PostAsync(qs.ToString(), new StreamContent(stream)).ConfigureAwait(false);
+                path = await resp.EnsureSuccessStatusCode().Content.ReadAsStringAsync().ConfigureAwait(false);
+            }
+            else
+            {
+                qs["path"] = path;
+                var resp = await _client.PutAsync(qs.ToString(), new StreamContent(stream)).ConfigureAwait(false);
+                path = await resp.EnsureSuccessStatusCode().Content.ReadAsStringAsync().ConfigureAwait(false);
+            }
             return path;
         }
 
@@ -64,7 +74,7 @@ namespace BlobServer.Client
         {
             if (path == null) throw new ArgumentNullException("path");
 
-            var qs = new QueryStringBuilder {{"path", path}};
+            var qs = new QueryStringBuilder { { "path", path } };
 
             var resp = await _client.GetAsync(qs.ToString()).ConfigureAwait(false);
             return await resp.EnsureSuccessStatusCode().Content.ReadAsStreamAsync().ConfigureAwait(false);

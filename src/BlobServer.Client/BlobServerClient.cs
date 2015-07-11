@@ -69,13 +69,27 @@ namespace BlobServer.Client
             if (resp.IsSuccessStatusCode)
                 return;
 
-            //var content = await resp.Content.ReadAsStringAsync().ConfigureAwait(false);
-            var stream = await resp.Content.ReadAsStreamAsync();
+            var ex = new BlobServerRequestException
+            {
+                StatusCode = resp.StatusCode,
+                Headers = resp.Headers,
+                
+            };
 
+            var stream = await resp.Content.ReadAsStreamAsync().ConfigureAwait(false);
             var ms = new MemoryStream();
-            stream.CopyTo(ms);
-            var content = Convert.ToBase64String(ms.ToArray());
-            throw new ApplicationException(content);
+            await stream.CopyToAsync(ms);
+            ex.Content = ms.ToArray();
+
+            if (resp.Content.Headers.ContentType.MediaType.StartsWith("text",StringComparison.OrdinalIgnoreCase))
+            {
+                ms.Position = 0;
+                var reader = new StreamReader(ms);
+                ex.StringContent = reader.ReadToEnd();
+            }
+
+
+            throw ex;
         }
         
         public async Task<byte[]> GetBytesAsync(string path)

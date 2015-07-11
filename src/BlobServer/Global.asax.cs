@@ -4,6 +4,7 @@ using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
 using BlobServer.Infrastructure;
+using DependencyResolver = System.Web.Mvc.DependencyResolver;
 
 namespace BlobServer
 {
@@ -11,14 +12,16 @@ namespace BlobServer
     {
         protected void Application_Start()
         {
+            var config = Configuration.CreateUsingConfigR();
+            var resolver = new Infrastructure.DependencyResolver(config);
             AreaRegistration.RegisterAllAreas();
-            GlobalConfiguration.Configure(WebApiConfig.Register);
+            GlobalConfiguration.Configure(cfg => WebApiConfig.Register(cfg, resolver));
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
 
-            Configuration.CreateUsingConfigR();
+            DependencyResolver.SetResolver(resolver);
         }
     }
 }

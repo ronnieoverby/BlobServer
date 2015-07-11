@@ -79,5 +79,10 @@ namespace BlobServer.Infrastructure
         {
             return Task.FromResult((Stream) new MemoryStream(_files[path]));
         }
+
+        public Task<FileStorageEntry[]> GetEntriesAsync(string path)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

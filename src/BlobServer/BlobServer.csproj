@@ -154,6 +154,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
+    <Compile Include="Controllers\BrowserController.cs" />
     <Compile Include="Infrastructure\ExceptionHandlingAttribute.cs" />
     <Compile Include="Infrastructure\Configuration.cs" />
     <Compile Include="Infrastructure\CustomWebHostBufferPolicySelector.cs" />
@@ -193,6 +194,9 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\FileSystemController.cs" />
     <Compile Include="Infrastructure\CapacityBasedStorageProvider.cs" />
+    <Compile Include="Models\Directory.cs" />
+    <Compile Include="Models\File.cs" />
+    <Compile Include="Models\FileStorageEntry.cs" />
     <Compile Include="Infrastructure\IStorageProvider.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -259,6 +263,7 @@
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Scripts\jquery-1.10.2.min.map" />
+    <None Include="Views\Browser\Index.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

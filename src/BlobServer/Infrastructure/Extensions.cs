@@ -18,5 +18,10 @@ namespace BlobServer.Infrastructure
         {
             return path.Trim(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
         }
+
+        public static string EnsureEndsWith(this string s, string suffix)
+        {
+            return s.EndsWith(suffix) ? s : s + suffix;
+        }
     }
 }

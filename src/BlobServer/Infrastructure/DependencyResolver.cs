@@ -6,7 +6,7 @@ using BlobServer.Controllers;
 
 namespace BlobServer.Infrastructure
 {
-    public class DependencyResolver : IDependencyResolver
+    public class DependencyResolver : IDependencyResolver, System.Web.Mvc.IDependencyResolver
     {
         private readonly Configuration _configuration;
 
@@ -19,6 +19,9 @@ namespace BlobServer.Infrastructure
         {
             if (serviceType == typeof (FileSystemController))
                 return new FileSystemController(_configuration.PathCreator, _configuration.StorageProvider);
+
+            if (serviceType == typeof (BrowserController))
+                return new BrowserController(_configuration.StorageProvider);
 
             return null;
         }

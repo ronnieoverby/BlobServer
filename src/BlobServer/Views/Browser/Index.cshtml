@@ -1,0 +1,49 @@
+﻿@using BlobServer.Infrastructure
+@model BlobServer.Controllers.BrowserDirectoryModel
+
+@{
+    var crumbs = Model.CurrentPath.SplitPath();
+}
+
+<ol class="breadcrumb">
+
+    <li>
+        <a href="@Url.Action("Index")">
+            <span class="glyphicon glyphicon-home" aria-hidden="true"></span>
+            
+        </a>
+        
+    </li>
+
+    @for (int i = 0; i < crumbs.Length - 1; i++)
+    {
+        var crumbPath = string.Join("/", Enumerable.Range(0, i + 1).Select(n => crumbs[n]));
+        
+        <li>
+            <a href="@Url.Action("Index", new {path = crumbPath})">@crumbs[i]</a>
+        </li>
+    
+    }
+    <li class="active">
+        @crumbs.Last()
+    </li>
+
+</ol>
+<ul>
+
+    @foreach (var d in Model.Entries.OfType<BlobServer.Models.Directory>().OrderBy(x => x.Name))
+    {
+        <li>
+            <span class="glyphicon glyphicon-folder-close" aria-hidden="true"></span>
+            @Html.ActionLink(d.Name, "Index", new { path = d.FullName })
+        </li>
+    }
+
+    @foreach (var f in Model.Entries.OfType<BlobServer.Models.File>().OrderBy(x => x.Name))
+    {
+        <li>
+            <a href="/api/files?path=@WebUtility.UrlEncode(f.FullName)">@f.Name</a>
+        </li>
+    }
+
+</ul>

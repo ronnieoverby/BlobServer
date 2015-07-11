@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
@@ -41,7 +42,12 @@ namespace BlobServer.Controllers
 
             var response = new HttpResponseMessage(HttpStatusCode.OK)
             {
-                Content = new StreamContent(stream)
+                Content = new StreamContent(stream),
+            };
+
+            response.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = path.SplitPath().Last()
             };
 
             contentType = contentType ?? MimeMapping.GetMimeMapping(Path.GetExtension(localPath));

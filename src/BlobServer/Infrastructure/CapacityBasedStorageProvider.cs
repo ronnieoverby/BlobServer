@@ -45,6 +45,13 @@ namespace BlobServer.Infrastructure
             return _storages[key];
         }
 
+        public IEnumerable<string> Keys
+        {
+            get { return _storages.Keys; }
+        }
+
+        public IEnumerable<IFileStorage> Storages { get { return _storages.Values; } }
+
         async private Task<IFileStorage> SelectStorageWithTheMostFreeSpaceAsync()
         {
             var stats = new List<Tuple<IFileStorage, FileStorageCapacity>>();

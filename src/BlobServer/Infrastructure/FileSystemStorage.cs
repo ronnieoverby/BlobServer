@@ -1,8 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using BlobServer.Models;
+using BlobServer.Infrastructure;
 using CoreTechs.Common;
+using Directory = BlobServer.Models.Directory;
+using File = BlobServer.Models.File;
 
 namespace BlobServer.Infrastructure
 {
@@ -104,6 +109,24 @@ namespace BlobServer.Infrastructure
             return Task.FromResult(stream);
         }
 
+        public Task<FileStorageEntry[]> GetEntriesAsync(string path)
+        {
+            var d = _directoryInfo.GetSubDirectory(path);
+
+            var entries = d.EnumerateDirectories().Select(dir => new Directory
+            {
+                FullName = new[]{Key,path.TrimDirectorySeparators(),dir.Name}.WhereNot(string.IsNullOrWhiteSpace).Join("/")
+            }).Cast<FileStorageEntry>().ToList();
+
+            entries.AddRange(d.EnumerateFiles().Select(f => new File
+            {
+                FullName = new[] { Key, path.TrimDirectorySeparators(), f.Name }.WhereNot(string.IsNullOrWhiteSpace).Join("/"),
+                Length = f.Length
+            }));
+
+            return Task.FromResult(entries.ToArray());
+
+        }
     }
 
 }

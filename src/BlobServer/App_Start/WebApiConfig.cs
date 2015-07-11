@@ -6,10 +6,9 @@ namespace BlobServer
 {
     public static class WebApiConfig
     {
-        public static void Register(HttpConfiguration config)
+        public static void Register(HttpConfiguration config,DependencyResolver resolver)
         {
-            var appConfig = Configuration.CreateUsingConfigR();
-            config.DependencyResolver = new DependencyResolver(appConfig);
+            config.DependencyResolver = resolver;
 
             // Web API configuration and services
             config.Services.Replace(typeof(IHostBufferPolicySelector), new CustomWebHostBufferPolicySelector());

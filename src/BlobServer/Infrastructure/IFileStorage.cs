@@ -15,6 +15,9 @@ namespace BlobServer.Infrastructure
         Task<bool> ExistsAsync(string path);
         Task<ByteSize> GetSize(string path);
         Task<Stream> GetReadStream(string path);
+
+        Task<FileStorageEntry[]> GetEntriesAsync(string path);
     }
+
 }
 

@@ -66,7 +66,7 @@ namespace BlobServer.Controllers
             {
                 var stg = await _storages.GetFileStorageAsync(ByteSize.FromBytes(stream.Length));
 
-                var path = _pathCreator.CreatePath(rootFolder.TrimDirectorySeparators(), filename, extension)
+                var path = _pathCreator.CreatePath((rootFolder ?? "").TrimDirectorySeparators(), filename, extension)
                     .TrimDirectorySeparators();
 
                 while (await stg.ExistsAsync(path))

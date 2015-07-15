@@ -1,9 +1,9 @@
 <Query Kind="Program">
-  <Reference Relative="BlobServer.Client\bin\Debug\BlobServer.Client.dll">D:\Code\BlobServer\src\BlobServer.Client\bin\Debug\BlobServer.Client.dll</Reference>
+  <Reference Relative="BlobServer.Client\bin\Debug\BlobClient.dll">D:\Code\BlobServer\src\BlobServer.Client\bin\Debug\BlobClient.dll</Reference>
   <Reference>&lt;RuntimeDirectory&gt;\System.Net.Http.dll</Reference>
   <NuGetReference>CoreTechs.Common</NuGetReference>
   <NuGetReference>Microsoft.AspNet.WebApi.Client</NuGetReference>
-  <Namespace>BlobServer.Client</Namespace>
+  <Namespace>BlobClient</Namespace>
   <Namespace>CoreTechs.Common</Namespace>
   <Namespace>System.Net.Http</Namespace>
   <Namespace>System.Threading.Tasks</Namespace>
@@ -11,15 +11,16 @@
 
 async Task Main()
 {
-	using(var client = new BlobServerClient("http://blobs.ctx.local"))
+	using(var client = new BlobServerClient("http://localhost:63238"))
 	{
-		var files = new DirectoryInfo(@"C:\Users\roverby\Desktop").GetFiles("en_visual_studio_professional_2012_x86_dvd_920779.iso",SearchOption.AllDirectories);
+		var files = new DirectoryInfo(@"C:\Users\roverby\Desktop").GetFiles("*",SearchOption.AllDirectories);
 		while(true)
 		{
 			var file = files.RandomElement();		
-			client.StoreBytesAsync(
-			var path = await client.StoreFromStreamAsync(
-				new SlowStream(file.OpenRead(),() => (RNG.NextDouble() * 1) .Seconds().Dump()), file.Name, rootFolder: "Batch/5");
+			string path = null;
+			using(var stream = file.OpenRead())
+				path = await client.StoreFromStreamAsync(stream,file.Name);
+				
 			var bytes = await client.GetBytesAsync(path.Dump());
 			await client.AppendBytesAsync(path, new byte[]{1});
 			await client.DeleteAsync(path);

@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using BlobClient;
 using CoreTechs.Common;
 
-namespace BlobServer.Infrastructure
+namespace BlobClient
 {
     public class DateTimePathCreator : IPathCreator
     {

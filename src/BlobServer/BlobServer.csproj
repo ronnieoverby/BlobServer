@@ -193,16 +193,11 @@
     <Compile Include="Infrastructure\Extensions.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\FileSystemController.cs" />
-    <Compile Include="Infrastructure\CapacityBasedStorageProvider.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Infrastructure\AppSettings.cs" />
     <Compile Include="Infrastructure\ByteEnumeratorStream.cs" />
-    <Compile Include="Infrastructure\DateTimePathCreator.cs" />
-    <Compile Include="Infrastructure\FileSystemStorage.cs" />
-    <Compile Include="Infrastructure\MemoryStorage.cs" />
-    <Compile Include="Infrastructure\RandomStorageProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

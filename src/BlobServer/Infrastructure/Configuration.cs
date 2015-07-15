@@ -12,6 +12,7 @@ namespace BlobServer.Infrastructure
 
         public static Configuration CreateUsingConfigR()
         {
+            Config.GlobalAutoLoadingReferences.Add(typeof(IStorageProvider).Assembly);
             Config.GlobalAutoLoadingReferences.Add(typeof(Configuration).Assembly);
             Config.GlobalAutoLoadingReferences.Add(typeof (DateTimePrecision).Assembly);
 

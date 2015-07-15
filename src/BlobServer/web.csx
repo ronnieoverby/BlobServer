@@ -1,4 +1,5 @@
-﻿using BlobServer.Infrastructure;
+﻿using BlobClient;
+using BlobServer.Infrastructure;
 using using CoreTechs.Common;
 
 var config = new Configuration

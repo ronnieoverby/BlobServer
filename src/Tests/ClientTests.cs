@@ -1,4 +1,4 @@
-﻿using BlobServer.Client;
+﻿using BlobClient;
 using NUnit.Framework;
 
 namespace Tests

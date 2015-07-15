@@ -3,9 +3,9 @@ using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace BlobServer.Client
+namespace BlobClient
 {
-    public class BlobServerClient : IDisposable
+    public class BlobServerClient : IBlobClient
     {
         private readonly HttpClient _client;
 
@@ -20,13 +20,6 @@ namespace BlobServer.Client
         public void Dispose()
         {
             _client.Dispose();
-        }
-
-        public async Task<string> StoreBytesAsync(byte[] bytes, string filename = null, string extension = null, string rootFolder = null, string path = null)
-        {
-            if (bytes == null) throw new ArgumentNullException("bytes");
-            using (var ms = new MemoryStream(bytes))
-                return await StoreFromStreamAsync(ms, filename, extension, path).ConfigureAwait(false);
         }
 
         public async Task<string> StoreFromStreamAsync(Stream stream, string filename = null, string extension = null, string rootFolder = null, string path = null)
@@ -91,17 +84,6 @@ namespace BlobServer.Client
 
             throw ex;
         }
-        
-        public async Task<byte[]> GetBytesAsync(string path)
-        {
-            if (path == null) throw new ArgumentNullException("path");
-            using (var stream = await GetStreamAsync(path).ConfigureAwait(false))
-            using (var ms = new MemoryStream())
-            {
-                await stream.CopyToAsync(ms).ConfigureAwait(false);
-                return ms.ToArray();
-            }
-        }
 
         public async Task<Stream> GetStreamAsync(string path)
         {
@@ -121,15 +103,6 @@ namespace BlobServer.Client
             var qs = new QueryStringBuilder { { "path", path } };
             var resp = await _client.DeleteAsync(qs.ToString()).ConfigureAwait(false);
             await EnsureSuccess(resp);
-        }
-
-        public async Task AppendBytesAsync(string path, byte[] bytes)
-        {
-            if (path == null) throw new ArgumentNullException("path");
-            if (bytes == null) throw new ArgumentNullException("bytes");
-
-            using (var ms = new MemoryStream(bytes))
-                await AppendFromStreamAsync(path, ms).ConfigureAwait(false);
         }
 
         public async Task AppendFromStreamAsync(string path, Stream stream)

@@ -7,8 +7,8 @@
     <ProjectGuid>{0E12AA11-5C97-41BD-AB47-FA78F0394FA3}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BlobServer.Client</RootNamespace>
-    <AssemblyName>BlobServer.Client</AssemblyName>
+    <RootNamespace>BlobClient</RootNamespace>
+    <AssemblyName>BlobClient</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -30,6 +30,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CoreTechs.Common, Version=16.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CoreTechs.Common.16.0.2\lib\net45\CoreTechs.Common.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
@@ -48,11 +52,26 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BlobClientExtensions.cs" />
     <Compile Include="BlobServerClient.cs" />
     <Compile Include="BlobServerRequestException.cs" />
+    <Compile Include="CapacityBasedStorageProvider.cs" />
+    <Compile Include="Directory.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="File.cs" />
+    <Compile Include="FileStorageCapacity.cs" />
+    <Compile Include="FileStorageEntry.cs" />
+    <Compile Include="FileSystemStorage.cs" />
+    <Compile Include="IBlobClient.cs" />
+    <Compile Include="IFileStorage.cs" />
+    <Compile Include="IPathCreator.cs" />
+    <Compile Include="IStorageProvider.cs" />
+    <Compile Include="LocalBlobClient.cs" />
+    <Compile Include="MemoryStorage.cs" />
+    <Compile Include="PathParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueryStringBuilder.cs" />
+    <Compile Include="RandomStorageProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

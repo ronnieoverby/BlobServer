@@ -1,7 +1,6 @@
 ﻿using System.Linq;
-using BlobServer.Infrastructure;
 
-namespace BlobServer.Models
+namespace BlobClient
 {
     public abstract class FileStorageEntry
     {

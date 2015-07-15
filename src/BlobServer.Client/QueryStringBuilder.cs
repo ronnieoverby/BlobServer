@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Net;
 
-namespace BlobServer.Client
+namespace BlobClient
 {
     public class QueryStringBuilder : Dictionary<string,string>
     {

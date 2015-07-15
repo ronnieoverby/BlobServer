@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using BlobClient;
+using BlobServer.Infrastructure;
 using CoreTechs.Common;
 
-namespace BlobServer.Infrastructure
+namespace BlobClient
 {
     public class CapacityBasedStorageProvider : IStorageProvider
     {

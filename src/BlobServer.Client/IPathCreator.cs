@@ -1,4 +1,4 @@
-namespace BlobServer.Infrastructure
+namespace BlobClient
 {
     public interface IPathCreator
     {

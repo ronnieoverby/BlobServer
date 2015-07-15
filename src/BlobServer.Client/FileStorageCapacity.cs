@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using CoreTechs.Common;
 
-namespace BlobServer.Models
+namespace BlobClient
 {
     public class FileStorageCapacity
     {

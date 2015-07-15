@@ -1,4 +1,4 @@
-namespace BlobServer.Models
+namespace BlobClient
 {
     public class Directory : FileStorageEntry
     {

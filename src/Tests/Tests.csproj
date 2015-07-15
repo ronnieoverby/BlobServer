@@ -50,9 +50,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BlobServer.Client\BlobServer.Client.csproj">
+    <ProjectReference Include="..\BlobServer.Client\BlobClient.csproj">
       <Project>{0E12AA11-5C97-41BD-AB47-FA78F0394FA3}</Project>
-      <Name>BlobServer.Client</Name>
+      <Name>BlobClient</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

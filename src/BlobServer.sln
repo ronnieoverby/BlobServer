@@ -5,7 +5,7 @@ VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlobServer", "BlobServer\BlobServer.csproj", "{C8A3946F-C08D-476D-9A86-981D0A82F870}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlobServer.Client", "BlobServer.Client\BlobServer.Client.csproj", "{0E12AA11-5C97-41BD-AB47-FA78F0394FA3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlobClient", "BlobServer.Client\BlobClient.csproj", "{0E12AA11-5C97-41BD-AB47-FA78F0394FA3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{5617C4C1-EDC7-4E3B-A516-4BCA9649295E}"
 EndProject

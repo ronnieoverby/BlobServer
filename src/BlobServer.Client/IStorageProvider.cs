@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using BlobServer.Models;
 using CoreTechs.Common;
 
-namespace BlobServer.Infrastructure
+namespace BlobClient
 {
     public interface IStorageProvider
     {

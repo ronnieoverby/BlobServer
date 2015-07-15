@@ -2,7 +2,7 @@ using System;
 using System.Net;
 using System.Net.Http.Headers;
 
-namespace BlobServer.Client
+namespace BlobClient
 {
     [Serializable]
     public class BlobServerRequestException : Exception

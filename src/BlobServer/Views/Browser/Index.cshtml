@@ -1,4 +1,6 @@
 ﻿@using BlobServer.Infrastructure
+@using Directory = BlobClient.Directory
+@using File = BlobClient.File
 @model BlobServer.Controllers.BrowserDirectoryModel
 
 @{
@@ -31,7 +33,7 @@
 </ol>
 <ul>
 
-    @foreach (var d in Model.Entries.OfType<BlobServer.Models.Directory>().OrderBy(x => x.Name))
+    @foreach (var d in Model.Entries.OfType<Directory>().OrderBy(x => x.Name))
     {
         <li>
             <span class="glyphicon glyphicon-folder-close" aria-hidden="true"></span>
@@ -39,7 +41,7 @@
         </li>
     }
 
-    @foreach (var f in Model.Entries.OfType<BlobServer.Models.File>().OrderBy(x => x.Name))
+    @foreach (var f in Model.Entries.OfType<File>().OrderBy(x => x.Name))
     {
         <li>
             <a href="/api/files?path=@WebUtility.UrlEncode(f.FullName)">@f.Name</a>

@@ -194,10 +194,6 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\FileSystemController.cs" />
     <Compile Include="Infrastructure\CapacityBasedStorageProvider.cs" />
-    <Compile Include="Models\Directory.cs" />
-    <Compile Include="Models\File.cs" />
-    <Compile Include="Models\FileStorageEntry.cs" />
-    <Compile Include="Infrastructure\IStorageProvider.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -207,9 +203,6 @@
     <Compile Include="Infrastructure\FileSystemStorage.cs" />
     <Compile Include="Infrastructure\MemoryStorage.cs" />
     <Compile Include="Infrastructure\RandomStorageProvider.cs" />
-    <Compile Include="Models\FileStorageCapacity.cs" />
-    <Compile Include="Infrastructure\IFileStorage.cs" />
-    <Compile Include="Infrastructure\IPathCreator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -266,7 +259,12 @@
     <Content Include="Scripts\jquery-1.10.2.min.map" />
     <Content Include="Views\Browser\Index.cshtml" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\BlobServer.Client\BlobClient.csproj">
+      <Project>{0E12AA11-5C97-41BD-AB47-FA78F0394FA3}</Project>
+      <Name>BlobClient</Name>
+    </ProjectReference>
+  </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />
